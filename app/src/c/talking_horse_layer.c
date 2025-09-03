@@ -67,7 +67,7 @@ void talking_horse_layer_set_text(TalkingHorseLayer *layer, const char *text) {
   TalkingHorseLayerData *data = layer_get_data(layer);
   data->text = text;
   GRect bounds = layer_get_bounds(layer);
-  data->text_size = graphics_text_layout_get_content_size_with_attributes(text, data->font, GRect(0, 1, bounds.size.w - 20, bounds.size.h - 15), GTextOverflowModeWordWrap, GTextAlignmentLeft, data->text_attributes);
+  data->text_size = graphics_text_layout_get_content_size_with_attributes(text, data->font, GRect(0, 1, bounds.size.w - PBL_IF_RECT_ELSE(20,25), bounds.size.h - 15), GTextOverflowModeWordWrap, GTextAlignmentLeft, data->text_attributes);
   layer_mark_dirty(layer);
 }
 
@@ -78,21 +78,22 @@ static void prv_update_layer(Layer *layer, GContext *ctx) {
 
   const int text_height = data->text_size.h + 5;
   const int speech_bubble_top = 1;
-  const int available_space = bounds.size.w - 18 - data->text_size.w - 10;
+  const int available_space = bounds.size.w - PBL_IF_RECT_ELSE(18,23) - data->text_size.w - 10;
   const int bubble_width = size.w - 16 - available_space;
   const int corner_offset = 6;
+  const int horse_offset = PBL_IF_RECT_ELSE(0,40);
 
 #if PBL_DISPLAY_WIDTH >= 200
-  GPoint tail_origin = GPoint(85 - available_space, size.h - 30 - speech_bubble_top);
+  GPoint tail_origin = GPoint(85 + horse_offset - available_space, size.h - 30 - speech_bubble_top);
   // When the text is three lines long, the tail runs into the bubble, so we need to move it.
   if (tail_origin.y < text_height + corner_offset) {
     tail_origin = GPoint(85 - available_space, size.h - 20 - speech_bubble_top);
   }
 #else
-  GPoint tail_origin = GPoint(55 - available_space, size.h - 30 - speech_bubble_top);
+  GPoint tail_origin = GPoint(55 + horse_offset - available_space, size.h - 30 - speech_bubble_top);
   // When the text is three lines long, the tail runs into the bubble, so we need to move it.
   if (tail_origin.y < text_height + corner_offset) {
-    tail_origin = GPoint(55 - available_space, size.h - 20 - speech_bubble_top);
+    tail_origin = GPoint(55 + horse_offset - available_space, size.h - 20 - speech_bubble_top);
   }
 #endif
 
@@ -133,7 +134,7 @@ static void prv_update_layer(Layer *layer, GContext *ctx) {
   GRect text_bounds = GRect(8 + corner_offset + available_space, speech_bubble_top + corner_offset - 5, data->text_size.w, data->text_size.h);
   graphics_draw_text(ctx, data->text, data->font, text_bounds, GTextOverflowModeWordWrap, GTextAlignmentLeft, data->text_attributes);
   GSize pony_bounds = gdraw_command_image_get_bounds_size(data->pony);
-  gdraw_command_image_draw(ctx, data->pony, GPoint(0, size.h - pony_bounds.h));
+  gdraw_command_image_draw(ctx, data->pony, GPoint(horse_offset, size.h - pony_bounds.h));
 }
 
 static GTextAttributes* prv_create_text_attributes(TalkingHorseLayer *layer) {

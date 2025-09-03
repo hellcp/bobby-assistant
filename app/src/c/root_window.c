@@ -110,7 +110,7 @@ static void prv_window_appear(Window* window) {
 #else
   uint16_t time_height = 40;
 #endif
-  rw->time_layer = btext_layer_create(GRect(0, 5, bounds.size.w - ACTION_BAR_WIDTH, time_height));
+  rw->time_layer = btext_layer_create(GRect(PBL_IF_RECT_ELSE(0, ACTION_BAR_WIDTH), PBL_IF_RECT_ELSE(5,13), bounds.size.w - PBL_IF_RECT_ELSE(1, 2) * ACTION_BAR_WIDTH, time_height));
   text_layer_set_text_alignment(rw->time_layer, GTextAlignmentCenter);
 #if PBL_DISPLAY_WIDTH >= 200
   text_layer_set_font(rw->time_layer, fonts_get_system_font(FONT_KEY_LECO_42_NUMBERS));
@@ -131,9 +131,9 @@ static void prv_window_appear(Window* window) {
   VersionInfo version_info = version_get_current();
   snprintf(rw->version_string, sizeof(rw->version_string), "v%d.%d", version_info.major, version_info.minor);
   rw->version_string[sizeof(rw->version_string) - 1] = '\0';
-  rw->version_layer = btext_layer_create(GRect(0, bounds.size.h - 18, bounds.size.w - ACTION_BAR_WIDTH - 4, 18));
+  rw->version_layer = btext_layer_create(GRect(PBL_IF_RECT_ELSE(0, ACTION_BAR_WIDTH), bounds.size.h - 18, bounds.size.w - ACTION_BAR_WIDTH * PBL_IF_RECT_ELSE(1,2) - 4, 18));
   text_layer_set_font(rw->version_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
-  text_layer_set_text_alignment(rw->version_layer, GTextAlignmentRight);
+  text_layer_set_text_alignment(rw->version_layer, PBL_IF_RECT_ELSE(GTextAlignmentRight, GTextAlignmentCenter));
   text_layer_set_background_color(rw->version_layer, GColorClear);
   text_layer_set_text(rw->version_layer, rw->version_string);
   layer_add_child(window_get_root_layer(rw->window), (Layer *)rw->version_layer);

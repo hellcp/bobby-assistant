@@ -101,10 +101,11 @@ static void prv_window_load(Window *window) {
   const FontsConfig *fonts = fonts_get_config();
   data->scroll_layer = bscroll_layer_create(window_bounds);
   scroll_layer_set_click_config_onto_window(data->scroll_layer, window);
-  data->title_layer = btext_layer_create(GRect(0, 0, window_bounds.size.w, 60));
+  data->title_layer = btext_layer_create(GRect(0, PBL_IF_RECT_ELSE(0, 3), window_bounds.size.w, 60));
   text_layer_set_text_alignment(data->title_layer, GTextAlignmentCenter);
   text_layer_set_font(data->title_layer, fonts->title_font);
-  data->text_layer = btext_layer_create(GRect(10, 30, window_bounds.size.w - 20, window_bounds.size.h - 30));
+  data->text_layer = btext_layer_create(GRect(10, 30, window_bounds.size.w - 20, 1000));
+  text_layer_set_text_alignment(data->text_layer, PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter));
   text_layer_set_font(data->text_layer, fonts->text_font);
   data->select_indicator_bitmap = bgbitmap_create_with_resource(RESOURCE_ID_BUTTON_INDICATOR);
   GRect select_indicator_size = gbitmap_get_bounds(data->select_indicator_bitmap);
@@ -126,10 +127,19 @@ static void prv_window_load(Window *window) {
   };
   content_indicator_configure_direction(indicator, ContentIndicatorDirectionDown, &content_indicator_config);
   layer_add_child(root_layer, scroll_layer_get_layer(data->scroll_layer));
+#if defined(PBL_ROUND)
+  scroll_layer_set_paging(data->scroll_layer, true);
+  GRect scroll_frame = GRect(0, 0, window_bounds.size.w, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT);
+  scroll_layer_set_frame(data->scroll_layer, scroll_frame);
+#endif
   layer_add_child(root_layer, (Layer *) data->select_indicator_layer);
   scroll_layer_add_child(data->scroll_layer, (Layer *) data->title_layer);
   scroll_layer_add_child(data->scroll_layer, (Layer *) data->text_layer);
   layer_add_child(root_layer, data->content_indicator_layer);
+#if defined(PBL_ROUND)
+  text_layer_enable_screen_text_flow_and_paging(data->title_layer, 3);
+  text_layer_enable_screen_text_flow_and_paging(data->text_layer, 5);
+#endif
   scroll_layer_set_callbacks(data->scroll_layer, (ScrollLayerCallbacks) {
     .click_config_provider = prv_click_config_provider,
   });

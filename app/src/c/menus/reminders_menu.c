@@ -105,6 +105,7 @@ static void prv_show_empty(Window *window) {
   window_set_background_color(window, BRANDED_BACKGROUND_COLOUR);
   bobby_status_bar_result_pane_config(data->status_bar);
   layer_add_child(root_layer, text_layer_get_layer(data->empty_text_layer));
+  text_layer_enable_screen_text_flow_and_paging(data->empty_text_layer, 5);
   layer_add_child(root_layer, vector_layer_get_layer(data->sleeping_horse_layer));
 }
 

@@ -98,6 +98,7 @@ static void prv_window_load(Window *window) {
   text_layer_set_text_alignment(data->title_layer, GTextAlignmentCenter);
   text_layer_set_background_color(data->title_layer, GColorClear);
   layer_add_child(root_layer, (Layer *)data->title_layer);
+  text_layer_enable_screen_text_flow_and_paging(data->title_layer, 5);
   GSize title_size = text_layer_get_content_size(data->title_layer);
   int16_t remaining_height = rect.size.h - STATUS_BAR_LAYER_HEIGHT - title_size.h - 49;
   data->time_layer = btext_layer_create(GRect(0, STATUS_BAR_LAYER_HEIGHT + title_size.h + remaining_height / 2 - 22 / 2, rect.size.w - ACTION_BAR_WIDTH, fonts->content_font_cap * 2));
@@ -105,6 +106,7 @@ static void prv_window_load(Window *window) {
   text_layer_set_text_alignment(data->time_layer, GTextAlignmentCenter);
   text_layer_set_background_color(data->time_layer, GColorClear);
   layer_add_child(root_layer, (Layer *)data->time_layer);
+  text_layer_enable_screen_text_flow_and_paging(data->time_layer, 5);
   data->tick_handle = events_tick_timer_service_subscribe_context(SECOND_UNIT, prv_tick_callback, window);
   time_t now = time(NULL);
   prv_tick_callback(localtime(&now), SECOND_UNIT, window);

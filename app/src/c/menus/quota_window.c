@@ -67,6 +67,7 @@ static void prv_window_load(Window* window) {
   data->usage_layer = usage_layer_create(GRect(10, 5, bounds.size.w - 20, 20));
   data->explanation_layer = btext_layer_create(GRect(10, 25, bounds.size.w - 20, 750));
   text_layer_set_font(data->explanation_layer, fonts->text_font);
+  text_layer_set_text_alignment(data->explanation_layer, PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter));
   scroll_layer_add_child(data->scroll_layer, (Layer *)data->explanation_layer);
   scroll_layer_add_child(data->scroll_layer, (Layer *)data->usage_layer);
   // We need to look up the quota, so we'll show a running pony while we do that.
@@ -134,4 +135,8 @@ static void prv_app_message_received(DictionaryIterator* iter, void* context) {
   vector_sequence_layer_stop(data->loading_layer);
   layer_remove_from_parent(data->loading_layer);
   layer_add_child(root_layer, (Layer *)data->scroll_layer);
+#if defined(PBL_ROUND)
+  scroll_layer_set_paging(data->scroll_layer, true);
+  text_layer_enable_screen_text_flow_and_paging(data->explanation_layer, 5);
+#endif
 }
