@@ -22,10 +22,11 @@
 #include "../util/memory/sdk.h"
 
 typedef struct {
- char *legal_text;
- FormattedTextLayer *text_layer;
- ScrollLayer *scroll_layer;
- StatusBarLayer *status_bar;
+  char *legal_text;
+  FormattedTextLayer *text_layer;
+  ScrollLayer *scroll_layer;
+  StatusBarLayer *status_bar;
+  Layer *scroll_indicator_down;
 } CreditsWindowData;
 
 static void prv_window_load(Window* window);
@@ -51,27 +52,60 @@ static void prv_window_load(Window* window) {
  resource_load(res_handle, (uint8_t*)data->legal_text, res_size);
  data->legal_text[res_size] = '\0';
  Layer *root_layer = window_get_root_layer(window);
- GRect window_bounds = layer_get_bounds(root_layer);
- data->status_bar = bstatus_bar_layer_create();
- bobby_status_bar_config(data->status_bar);
- layer_add_child(root_layer, status_bar_layer_get_layer(data->status_bar));
+  GRect window_bounds = layer_get_frame(root_layer);
+  data->status_bar = bstatus_bar_layer_create();
+  bobby_status_bar_config(data->status_bar);
+  layer_add_child(root_layer, status_bar_layer_get_layer(data->status_bar));
  data->scroll_layer = bscroll_layer_create(GRect(0, STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT));
  scroll_layer_set_shadow_hidden(data->scroll_layer, true);
  scroll_layer_set_click_config_onto_window(data->scroll_layer, window);
- layer_add_child(root_layer, scroll_layer_get_layer(data->scroll_layer));
- data->text_layer = formatted_text_layer_create(GRect(5, 0, window_bounds.size.w - 10, 10000));
- formatted_text_layer_set_text(data->text_layer, data->legal_text);
+  layer_add_child(root_layer, scroll_layer_get_layer(data->scroll_layer));
+
+#if defined(PBL_ROUND)
+  data->scroll_indicator_down = blayer_create(GRect(0, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, STATUS_BAR_LAYER_HEIGHT));
+  layer_add_child(root_layer, data->scroll_indicator_down);
+  ContentIndicator* indicator = scroll_layer_get_content_indicator(data->scroll_layer);
+  const ContentIndicatorConfig up_config = (ContentIndicatorConfig) {
+    .layer = status_bar_layer_get_layer(data->status_bar),
+    .times_out = true,
+    .alignment = GAlignCenter,
+    .colors = {
+      .foreground = GColorBlack,
+      .background = GColorClear,
+    }
+  };
+  content_indicator_configure_direction(indicator, ContentIndicatorDirectionUp, &up_config);
+  const ContentIndicatorConfig down_config = (ContentIndicatorConfig) {
+    .layer = data->scroll_indicator_down,
+    .times_out = true,
+    .alignment = GAlignCenter,
+    .colors = {
+      .foreground = GColorBlack,
+      .background = GColorClear,
+    },
+  };
+  content_indicator_configure_direction(indicator, ContentIndicatorDirectionDown, &down_config);
+  scroll_layer_set_paging(data->scroll_layer, true);
+  GRect scroll_frame = GRect(0, STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, 120);
+  scroll_layer_set_frame(data->scroll_layer, scroll_frame);
+#endif
+  data->text_layer = formatted_text_layer_create(PBL_IF_RECT_ELSE(GRect(5, 0, window_bounds.size.w - 10, 10000), GRect(20, 20, window_bounds.size.w - 40, 10000 - 40)));
+  formatted_text_layer_set_text_alignment(data->text_layer, PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter));
+  formatted_text_layer_set_text(data->text_layer, data->legal_text);
  GSize text_size = formatted_text_layer_get_content_size(data->text_layer);
- scroll_layer_set_content_size(data->scroll_layer, GSize(window_bounds.size.w, text_size.h + 10));
+  scroll_layer_set_content_size(data->scroll_layer, PBL_IF_RECT_ELSE(GSize(window_bounds.size.w, 5 + text_size.h + 5), GSize(window_bounds.size.w, 20 + text_size.h + 20)));
  scroll_layer_add_child(data->scroll_layer, formatted_text_layer_get_layer(data->text_layer));
 }
 
 static void prv_window_unload(Window* window) {
  CreditsWindowData *data = window_get_user_data(window);
- free(data->legal_text);
- formatted_text_layer_destroy(data->text_layer);
- scroll_layer_destroy(data->scroll_layer);
- status_bar_layer_destroy(data->status_bar);
- free(data);
+  free(data->legal_text);
+  formatted_text_layer_destroy(data->text_layer);
+  scroll_layer_destroy(data->scroll_layer);
+  status_bar_layer_destroy(data->status_bar);
+#if defined(PBL_ROUND)
+  layer_destroy(data->scroll_indicator_down);
+#endif
+  free(data);
  window_destroy(window);
 }

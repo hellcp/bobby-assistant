@@ -62,7 +62,7 @@ void feedback_window_push() {
 
 static void prv_window_load(Window *window) {
   FeedbackWindowData *data = window_get_user_data(window);
-  GRect bounds = layer_get_bounds(window_get_root_layer(window));
+  GRect bounds = layer_get_frame(window_get_root_layer(window));
   Layer *layer = window_get_root_layer(window);
 
   data->status_bar_layer = bstatus_bar_layer_create();
@@ -77,6 +77,11 @@ static void prv_window_load(Window *window) {
   scroll_layer_set_context(data->scroll_layer, window);
   scroll_layer_set_click_config_onto_window(data->scroll_layer, window);
   layer_add_child(layer, scroll_layer_get_layer(data->scroll_layer));
+#if defined(PBL_ROUND)
+  scroll_layer_set_paging(data->scroll_layer, true);
+  GRect scroll_frame = GRect(0, STATUS_BAR_LAYER_HEIGHT, bounds.size.w, 125);
+  scroll_layer_set_frame(data->scroll_layer, scroll_frame);
+#endif
   data->scroll_indicator_down = blayer_create(GRect(0, bounds.size.h - STATUS_BAR_LAYER_HEIGHT, bounds.size.w, STATUS_BAR_LAYER_HEIGHT));
   layer_add_child(layer, data->scroll_indicator_down);
   ContentIndicator* indicator = scroll_layer_get_content_indicator(data->scroll_layer);
@@ -107,12 +112,13 @@ static void prv_window_load(Window *window) {
   resource_load(blurb_handle, (uint8_t *)data->blurb, blurb_length);
   data->blurb[blurb_length] = '\0';
 
-  data->text_layer = formatted_text_layer_create(GRect(5, 5, bounds.size.w - 10, 2000));
+  data->text_layer = formatted_text_layer_create(PBL_IF_RECT_ELSE(GRect(5, 5, bounds.size.w - 10, 2000), GRect(20, 20, bounds.size.w - 40, 2000 - 40)));
+  formatted_text_layer_set_text_alignment(data->text_layer, PBL_IF_RECT_ELSE(GTextAlignmentLeft, GTextAlignmentCenter));
   formatted_text_layer_set_text(data->text_layer, data->blurb);
   GSize text_size = formatted_text_layer_get_content_size(data->text_layer);
-  layer_set_frame(formatted_text_layer_get_layer(data->text_layer), GRect(5, 5, bounds.size.w - 10, text_size.h));
+  layer_set_frame(formatted_text_layer_get_layer(data->text_layer), PBL_IF_RECT_ELSE(GRect(5, 5, bounds.size.w - 10, text_size.h), GRect(20, 20, bounds.size.w - 40, text_size.h)));
   scroll_layer_add_child(data->scroll_layer, formatted_text_layer_get_layer(data->text_layer));
-  scroll_layer_set_content_size(data->scroll_layer, GSize(bounds.size.w, text_size.h + 10));
+  scroll_layer_set_content_size(data->scroll_layer, PBL_IF_RECT_ELSE(GSize(bounds.size.w, 5 + text_size.h + 5), GSize(bounds.size.w, 20 + text_size.h + 20)));
 
   data->select_indicator = bgbitmap_create_with_resource(RESOURCE_ID_BUTTON_INDICATOR);
   GRect select_indicator_size = gbitmap_get_bounds(data->select_indicator);
