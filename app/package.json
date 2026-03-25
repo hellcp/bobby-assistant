@@ -23,7 +23,8 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "emery",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": false
@@ -336,7 +337,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -355,7 +357,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -374,7 +377,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -393,7 +397,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -412,7 +417,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -431,7 +437,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -450,7 +457,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -500,7 +508,8 @@
           "targetPlatforms": [
             "basalt",
             "chalk",
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -527,7 +536,8 @@
           "name": "FONT_GOTHIC_36",
           "type": "raw",
           "targetPlatforms": [
-            "emery"
+            "emery",
+            "gabbro"
           ]
         },
         {
@@ -535,7 +545,8 @@
           "name": "FONT_GOTHIC_36_BOLD",
           "type": "raw",
           "targetPlatforms": [
-            "emery"
+            "emery",
+            "gabbro"
           ]
         }
       ]
